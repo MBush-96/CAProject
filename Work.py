@@ -3,10 +3,14 @@
 Created on Wed Dec 30 22:27:16 2020
 """
 
+import base64
 from kivy.app import App
+from cryptography.fernet import Fernet, InvalidToken
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from kivy.properties import ObjectProperty
-from kivy.uix.screenmanager import Screen
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import Screen,ScreenManager
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
@@ -20,12 +24,34 @@ Centered_InPopupY = .8
 Popup_HeightY = 200
 Popup_WidthX = 400
 _FileUsed = "PUEIntact.txt"
+_OutputFile = "PUEIntact.encrypted"
+Password_forcrypt  = "PlaceHolder" #PH figure out how to get this whenever any diffrent person uses it
+Password_tocrypt = Password_forcrypt.encode()
+salt = b'\xc4\xe4\x18\xb8j\x874\xd5r\xef\xbcV\xf2\xbe\xb0\xaf'
+kdf = PBKDF2HMAC(
+    algorithm=hashes.SHA256,
+    length=32,
+    salt=salt,
+    iterations=100100,
+    backend=default_backend()
+)
+
+key = base64.urlsafe_b64encode(kdf.derive(Password_tocrypt))
+try:
+    f = open(_FileUsed, "x")
+    f.close()
+except FileExistsError:
+    pass
+
+
+
+
 class CreateAccountWindow(Screen):
     username = ObjectProperty(None)
     password = ObjectProperty(None)
     email = ObjectProperty(None)
     
-    def MakeNameErrorPopup(instance):
+    def MakeNameErrorPopup(self):
         _floatlayout_NameError = FloatLayout()
         _floatlayout_NameError.add_widget(Label(text="Invalid username no special characters allowed.\nOr username is already taken.",
                                       size_hint=(.1, .1), pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY}))
@@ -34,19 +60,19 @@ class CreateAccountWindow(Screen):
                                                 pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY -.3}))
         return _floatlayout_NameError
     
-    def MakeAttrErrorPopup(instance):
+    def MakeAttrErrorPopup(self):
         _floatlayout_AttrError = FloatLayout()
         _floatlayout_AttrError.add_widget(Label(text="Username/Password can't be blank.", size_hint=(.1, .1),
                                                 pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY }))
         return _floatlayout_AttrError
     
-    def InvalidEmail(instance):
+    def InvalidEmail(self):
         _floatlayout_InvEmail = FloatLayout()
         _floatlayout_InvEmail.add_widget(Label(text="Email is invalid.", size_hint=(.1, .1),
                                          pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY }))
         return _floatlayout_InvEmail
     
-    def InvalidUsername(instance):
+    def InvalidUsername(self):
         _floatlayout_UsernameTaken = FloatLayout()
         _floatlayout_UsernameTaken.add_widget(Label(text="Username is taken.", size_hint=(.1, .1),
                                                     pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY}))
@@ -54,8 +80,16 @@ class CreateAccountWindow(Screen):
     
     def SuccessSignUp(self):
             print("Name -> ", self.username.text, "Password -> ", self.password.text, "Email -> ", self.email.text)
-            with open(_FileUsed, "w") as f:
-                f.write(self.username.text + ";" + self.password.text + ";" + self.email.text)
+            with open(_FileUsed, "a") as f:
+                f.write(self.username.text + ";" + self.password.text + ";" + self.email.text + "\n")
+            with open(_FileUsed, "rb") as f: # open as reading bytes
+                data = f.read() # read bytes of file
+
+            fernet = Fernet(key)
+            encrypted = fernet.encrypt(data)
+
+            with open(_OutputFile, "wb") as f:
+                f.write(encrypted)
             self.username.text = ""
             self.password.text = ""
             self.email.text = ""
@@ -121,12 +155,15 @@ class LoginWindow(Screen):
     def ButtonLogin(self):
         with open(_FileUsed, "r") as f:
             for line in f:
-                if line.startswith(self.uname.text):
+                if line.startswith(self.uname.text) and self.uname.text != "":
                     if self.passwl.text in line:
                         self.SuccessfulLogin()
                     else:
                         self.uname.text = ""
                         self.passwl.text = ""
+                else:
+                    self.uname.text = ""
+                    self.passwl.text = ""
 
 class LoggedIn(Screen):
     pass
