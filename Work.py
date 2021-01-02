@@ -27,7 +27,6 @@ class CreateAccountWindow(Screen):
     password = ObjectProperty(None)
     email = ObjectProperty(None)
     
-    ############################################
     def MakeNameErrorPopup(instance):
         _floatlayout_NameError = FloatLayout()
         _floatlayout_NameError.add_widget(Label(text="Invalid username no special characters allowed.\nOr username is already taken.",
@@ -36,14 +35,12 @@ class CreateAccountWindow(Screen):
         _floatlayout_NameError.add_widget(Label(text="#, $, % ,^, &, !, SPACE, Etc..", size_hint=(.1, .1),
                                                 pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY -.3}))
         return _floatlayout_NameError
-    ############################################
     
     def MakeAttrErrorPopup(instance):
         _floatlayout_AttrError = FloatLayout()
         _floatlayout_AttrError.add_widget(Label(text="Username/Password can't be blank.", size_hint=(.1, .1),
                                                 pos_hint={"x": Centered_InPopupX, "y": Centered_InPopupY }))
         return _floatlayout_AttrError
-    ############################################
     
     def InvalidEmail(instance):
         _floatlayout_InvEmail = FloatLayout()
