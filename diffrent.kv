@@ -1,0 +1,127 @@
+<CreateAccountWindow>
+    name: "CreateAccount"
+    
+    username:username
+    password:password
+    email:email
+    
+    FloatLayout:
+        Label:
+            size_hint: 0.07, 0
+            font_size: 15
+            text: "Username -> "
+            pos_hint: {"x": 0.03, "top": .96}  # Position (X, Y, Top, Bottom)
+        
+        Label:
+            text: "Password -> "
+            size_hint: .07, 0
+            pos_hint: {"x": .03, "top": .87}
+            font_size: 15
+            
+        Label:
+            text: "Email - > "
+            size_hint: .07, 0
+            font_size: 15
+            pos_hint: {"x": .03, "top": .78}
+            
+        Label:
+            text: "(Optional)"
+            size_hint: .07, 0
+            pos_hint: {"x": .65, "top": .78}
+            font_size: 12
+            
+        TextInput:
+            id:password
+            size_hint: .5, .06
+            multiline: False
+            pos_hint: {"x": .126, "top": .9}
+            
+        TextInput:
+            id:username
+            size_hint: .5, .06
+            multiline: False
+            pos_hint: {"x": .126, "top": .99}
+            
+        TextInput:
+            id:email
+            size_hint: .5, .06
+            multiline: False
+            pos_hint: {"x": .126, "top": .81}
+        
+        
+            
+        Button:
+            font_size: 15
+            color: 0, 0, 0, 1    # (R, G, B, A)
+            size_hint: .18, .05      # (X, Y)
+            pos_hint: {"x": .41, "top": .7}
+            text: "Sign Up"
+            on_press: root.Button()
+            
+        Button:
+            font_size: 15
+            color: 0, 0, 0, 1    # (R, G, B, A)
+            size_hint: .18, .05      # (X, Y)
+            pos_hint: {"x": .15, "top": .7}
+            text: "Login"
+            on_press: 
+                root.GoToLoginScreen()
+                root.manager.transition.direction = "right"
+            
+<LoginWindow>
+    name: "Login"
+    
+    uname:uname
+    passwl:passwl
+    
+    FloatLayout:
+        Label:
+            text: "Username -> "
+            font_size: 15
+            size_hint: .07, 0
+            pos_hint: {"x": 0.03, "top": .96}
+            
+        Label:
+            text: "Password -> "
+            font_size: 15
+            size_hint: .07, 0
+            pos_hint: {"x": .03, "top": .87}
+            
+        TextInput:
+            id:uname
+            size_hint: .5, .06
+            multiline: False
+            pos_hint: {"x": .126, "top": .99}
+            
+            
+        TextInput:
+            id:passwl
+            size_hint: .5, .06
+            multiline: False
+            pos_hint: {"x": .126, "top": .9}
+            
+        Button:
+            font_size: 15
+            color: 0, 0, 0, 1
+            size_hint: .18, .05
+            pos_hint: {"x": .41, "top": .79}
+            text: "Sign in"
+            on_press:
+                root.ButtonLogin()
+            
+        Button:
+            font_size: 15
+            color: 0, 0, 0, 1
+            size_hint: .18, .05
+            pos_hint: {"x": .15, "top": .79}
+            text: "Create Account"
+            on_press: 
+                root.ButtonCA()
+                root.manager.transition.direction = "up"
+                
+<LoggedIn>
+    name: "SuccessLogin"
+    
+    FloatLayout:
+        Label:
+            text: "HI"
