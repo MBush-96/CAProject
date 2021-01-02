@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Dec 30 22:27:16 2020
-
-@author: mason
 """
 
 from kivy.app import App
