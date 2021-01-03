@@ -4,6 +4,7 @@ Created on Wed Dec 30 22:27:16 2020
 """
 
 import base64
+import os
 from kivy.app import App
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
@@ -88,11 +89,13 @@ class CreateAccountWindow(Screen):
             fernet = Fernet(key)
             encrypted = fernet.encrypt(data)
 
-            with open(_OutputFile, "wb") as f:
+            with open(_OutputFile, "ab") as f:
                 f.write(encrypted)
             self.username.text = ""
             self.password.text = ""
             self.email.text = ""
+            if os.path.exists(_FileUsed):
+                os.remove(_FileUsed)
         
     def GoToLoginScreen(self):
         sm.current = "Login"
@@ -108,10 +111,21 @@ class CreateAccountWindow(Screen):
                 tv_has_specChar = True
                 break
             
-        with open(_FileUsed, "r") as f:
-            for line in f:
-                if line.startswith(self.username.text):
-                    UsernameIsTaken = True
+        with open(_OutputFile, "rb") as f:
+            data = f.read()
+            fernet = Fernet(key)
+        try:
+            decrypted = fernet.decrypt(data)
+            with open(_FileUsed, "x")as f:
+                with open(_FileUsed, "a") as f:
+                    f.write(decrypted.decode())
+                    with open(_FileUsed, "r") as f:
+                        for line in f:
+                            if line.startswith(self.username.text):
+                                UsernameIsTaken = True
+
+        except InvalidToken:
+            print("Invalid Key")
             
         if tv_has_specChar or UsernameIsTaken:
             Pop_NameError = Popup(title = "Invalid Username.",
@@ -152,6 +166,7 @@ class LoginWindow(Screen):
     def ButtonCA(self):
         sm.current = "CreateAccount"
         
+############################################## TODO OPEN BINARY FILE AND READ WRITE IT TO ANOTHER FILE
     def ButtonLogin(self):
         with open(_FileUsed, "r") as f:
             for line in f:
@@ -164,6 +179,8 @@ class LoginWindow(Screen):
                 else:
                     self.uname.text = ""
                     self.passwl.text = ""
+############################################## TODO USE TEXT FILE THAT IS WRITTEN TO; TO CHECK USERNAME TO PASSWORD
+############### THEN DELETE THE TEXT FILE
 
 class LoggedIn(Screen):
     pass
